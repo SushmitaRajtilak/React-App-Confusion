@@ -13,11 +13,7 @@ class Dishdetail extends Component {
                     <p>{comment.comment}</p>
                     <p>-- {comment.author},
                     &nbsp;
-                    {new Intl.DateTimeFormat('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: '2-digit'
-                        }).format(new Date(comment.date))}
+                    {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}
                     </p>
                 </li>
             )
@@ -70,4 +66,4 @@ class Dishdetail extends Component {
     }
 }
 
-export default Dishdetail
+export default Dishdetail;
