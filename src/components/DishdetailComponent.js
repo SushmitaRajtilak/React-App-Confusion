@@ -17,6 +17,8 @@ import {
 } from 'reactstrap';
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Link } from 'react-router-dom';
+import { Loading } from './LoadingComponent';
+
 
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !val || val.length <= len;
@@ -128,38 +130,51 @@ class CommentForm extends Component {
 }
 
 const DishDetail = (props) => {
-    const { dish, comments } = props;
-
-    if (!dish) {
-        return <div></div>;
+    if (props.isLoading) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
     }
-
-    return (
-        <div className="container">
-            <div className="row">
-                <Breadcrumb>
-                    <BreadcrumbItem>
-                        <Link to="/menu">Menu</Link>
-                    </BreadcrumbItem>
-                    <BreadcrumbItem active>{dish.name}</BreadcrumbItem>
-                </Breadcrumb>
-                <div className="col-12">
-                    <h3>{dish.name}</h3>
-                    <hr />
+    else if (props.errMess) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <h4>{props.errMess}</h4>
                 </div>
             </div>
-            <div className="row">
-                <RenderDish dish={dish} />
+        );
+    }
+    else if (props.dish != null)
+        return (
+            <div className="container">
+                <div className="row">
+                    <Breadcrumb>
+                        <BreadcrumbItem>
+                            <Link to="/menu">Menu</Link>
+                        </BreadcrumbItem>
+                        <BreadcrumbItem active>{dish.name}</BreadcrumbItem>
+                    </Breadcrumb>
+                    <div className="col-12">
+                        <h3>{dish.name}</h3>
+                        <hr />
+                    </div>
+                </div>
+                <div className="row">
+                    <RenderDish dish={dish} />
 
-                <div className="col-12 col-md-5">
-                <RenderComments comments={props.comments}
-        addComment={props.addComment}
-        dishId={props.dish.id}
-      />
+                    <div className="col-12 col-md-5">
+                        <RenderComments comments={props.comments}
+                            addComment={props.addComment}
+                            dishId={props.dish.id}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
 };
 
 const RenderDish = ({ dish }) => (
@@ -172,7 +187,7 @@ const RenderDish = ({ dish }) => (
     </Card>
 );
 
-function RenderComments({comments, addComment, dishId}) {
+function RenderComments({ comments, addComment, dishId }) {
     const renderedComments = comments.map((item) => (
         <li key={item.id}>
             <p>{item.comment}</p>
