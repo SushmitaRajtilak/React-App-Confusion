@@ -1,20 +1,24 @@
 import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardHeader, Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import {baseUrl} from '../shared/baseUrl';
+import {Fade,Stagger } from 'react-animation-components';
 
-function RenderLeader({leadername, leaderimage, leaderdescription, leaderdesignation})
+
+const RenderLeader=(props)=>
 {
     return(
-        <Media tage ="li">
-            <Media left middle>
-                <Media object src = {leaderimage} alt = {leadername} />
-            </Media>
-            <Media body className = "ml-5">
-                <Media heading>{leadername}</Media>
-                <p>{leaderdesignation} <br></br></p>
-                <p>{leaderdescription}</p>
-            </Media>
+    <Media tag="li">
+        <Media left middle>
+        <Media object src={baseUrl+ props.leader.image} alt={props.leader.name} />
         </Media>
+
+        <Media body className="ml-5">
+            <Media heading>{props.leader.name}</Media>
+            <p>{props.leader.designation}</p>
+            <p>{props.leader.description}</p>
+        </Media>
+    </Media>
     );
 }
 
@@ -22,12 +26,9 @@ function About(props) {
 
     const leaders = props.leaders.map((leader) => {
         return (
-            <div key = {leader.id} className= "col-12 mt-5">
-                <RenderLeader leadername = {leader.name} leaderimage = {leader.image} leaderdescription = {leader.description} leaderdesignation = {leader.designation} />
-            </div>
+           <Fade in> <RenderLeader leader={leader}/><br /></Fade>
         );
     });
-
     return(
         <div className="container">
             <div className="row">
@@ -38,7 +39,7 @@ function About(props) {
                 <div className="col-12">
                     <h3>About Us</h3>
                     <hr />
-                </div>
+                </div>                
             </div>
             <div className="row row-content">
                 <div className="col-12 col-md-6">
@@ -61,9 +62,9 @@ function About(props) {
                                 <dd className="col-6">40</dd>
                             </dl>
                         </CardBody>
-                        </Card>
+                    </Card>
                 </div>
-                <div className="col-12">
+                 <div className="col-12">
                     <Card>
                         <CardBody className="bg-faded">
                             <blockquote className="blockquote">
@@ -84,7 +85,9 @@ function About(props) {
                 </div>
                 <div className="col-12">
                     <Media list>
+                    <Stagger in>
                         {leaders}
+                    </Stagger>
                     </Media>
                 </div>
             </div>
@@ -92,5 +95,6 @@ function About(props) {
     );
 }
 
-export default About;
-                  
+
+
+export default About;  
