@@ -1,45 +1,68 @@
 var express = require('express');
-var bodyParser = require('body-parser');
+var promotionRouter  = express.Router();
 
-var dishRouter = express.Router();
+var Verify = require('./verify');
 
-dishRouter.use(bodyParser.json());
+var mongoose = require('mongoose');
 
-dishRouter.route('/')
-	.all(function (req, res, next) {
-		res.writeHead(200, {'Content-Type': 'text/plain'});
-		next();
-	})
+var promotions = require('../models/promotions');
 
-	.get(function (req, res, next) {
-		res.end('Will send all the dishes to you!');
-	})
+promotionRouter.route('/')
+.get(Verify.verifyOrdinaryUser, function(req,res,next){
 
-	.post(function (req, res, next) {
-		res.end('Will add the dish: ' + req.body.name + ' with details: ' + req.body.description);
-	})
+  promotions.find({}, function(err, promotion){
+      if(err){
+        throw err;
+      }
+      res.json(promotion);
+  });
 
-	.delete(function (req, res, next) {
-		res.end('Deleting all dishes');
-	});
+})
 
-dishRouter.route('/:dishId')
-	.all(function (req, res, next) {
-		res.writeHead(200, {'Content-Type': 'text/plain'});
-		next();
-    })
-    .get(function (req, res, next) {
-		res.end('Will send details of the dish: ' + req.params.dishId + ' to you!');
-	})
+.post(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+    promotions.create(req.body, function (err, promotion) {
+        if (err) throw err;
+        console.log('promotion created!');
+        var id = promotion._id;
 
-	.put(function (req, res, next) {
-		res.write('Updating the dish: ' + req.params.dishId + '\n');
-		res.end('Will update the dish: ' + req.body.name +
-			' with details: ' + req.body.description);
-	})
+        res.writeHead(200, {
+            'Content-Type': 'text/plain'
+        });
+        res.end('Added the promotion with id: ' + id);
+    });
+})
 
-	.delete(function (req, res, next) {
-		res.end('Deleting dish: ' + req.params.dishId);
-	});
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+    promotions.remove({}, function (err, resp) {
+        if (err) throw err;
+        res.json(resp);
+    });
+});
 
-exports.router = dishRouter;
+promotionRouter.route('/:promotionId')
+
+.get(Verify.verifyOrdinaryUser, function (req, res, next) {
+    promotions.findById(req.params.promotionId, function (err, promotion) {
+        if (err) throw err;
+        res.json(promotion);
+    });
+})
+
+.put(Verify.verifyOrdinaryUser, Verify.verifyAdmin,function (req, res, next) {
+    promotions.findByIdAndUpdate(req.params.promotionId, {
+        $set: req.body
+    }, {
+        new: true
+    }, function (err, promotion) {
+        if (err) throw err;
+        res.json(promotion);
+    });
+})
+
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+    promotions.findByIdAndRemove(req.params.promotionId, function (err, resp) {        if (err) throw err;
+        res.json(resp);
+    });
+});
+
+module.exports = promotionRouter;
